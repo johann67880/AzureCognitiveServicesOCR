@@ -1,7 +1,8 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace FieldRules
 {
@@ -11,8 +12,56 @@ namespace FieldRules
         {
             return new List<Func<bool>>
             {
-                //TODO: Define here all the rules needed to validate if value is IVA
+                //You can add as many rules as you want
+                () => IsIVA(value)
             }.Any(iva => iva());
+        }
+
+        public static bool IsIVA(string value)
+        {
+            List<string> fieldName = new List<string>()
+            {
+                "IVA",
+                "I.V.A."
+            };
+
+            //Only process value when contains one of the FieldName.
+            if (!fieldName.Contains(value))
+                return false;
+
+            //Regular Expressions to determine if is a valid NIT
+            List<string> validFormats = new List<string>()
+            {
+                "^[0-9.]*$"
+            };
+
+            string result = ExtractIVA(value);
+
+            //returns true when at least one pattern is valid.
+            return validFormats.Any(x => Regex.IsMatch(result, x));
+        }
+
+        public static string ExtractIVA(string value)
+        {
+            //When is NIT, then remove all the follow words or symbols.
+            List<string> rulesList = new List<string>()
+            {
+                "IVA",
+                "I.V.A.",
+                "+",
+                "$",
+                ".",
+                ",",
+                " "
+            };
+
+            string result = string.Empty;
+
+            rulesList.ForEach(x =>
+                result = value.Replace(x, string.Empty).Trim()
+            );
+
+            return result;
         }
     }
 }
