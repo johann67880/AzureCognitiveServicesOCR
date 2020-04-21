@@ -12,6 +12,12 @@ namespace FieldRules
 {
     public class BatchReadFile
     {
+        string NITValue = string.Empty;
+        string IVAValue = string.Empty;
+        string InvoiceNumber = string.Empty;
+        string Subtotal = string.Empty;
+        string InvoiceDate = string.Empty;
+
         public async Task RunAsync(string endpoint, string key)
         {
             ComputerVisionClient computerVision = new ComputerVisionClient(new ApiKeyServiceClientCredentials(key))
@@ -20,7 +26,7 @@ namespace FieldRules
             };
 
             const int numberOfCharsInOperationId = 36;
-            string localImagePath = @"D:\TEMP\OCR\PDFFILE.pdf";
+            string localImagePath = @"D:\TEMP\OCR\1.pdf";
             BatchReadFileFromStreamAsync(computerVision, localImagePath, numberOfCharsInOperationId).Wait(5000);
         }
 
@@ -68,33 +74,29 @@ namespace FieldRules
                 await Task.Delay(1000);
                 result = await computerVision.GetReadOperationResultAsync(operationId);
             }
-            
+
             // Display the results
-            Console.WriteLine();
             var recResults = result.RecognitionResults;
 
             foreach (TextRecognitionResult recResult in recResults)
             {
                 foreach (Line line in recResult.Lines)
                 {
-                    foreach (Word item in line.Words)
-                    {
-                        Console.WriteLine(item.Text);
-                        ProcessValue(item.Text);
-                    }
+                    ProcessValue(line.Text);
                 }
             }
+
+            Console.WriteLine($"NIT:{NITValue}");
+            Console.WriteLine($"NIT:{IVAValue}");
+            Console.WriteLine($"NIT:{InvoiceNumber}");
+            Console.WriteLine($"NIT:{Subtotal}");
+            Console.WriteLine($"NIT:{InvoiceDate}");
 
             Console.ReadLine();
         }
 
         private void ProcessValue(string value)
         {
-            string NITValue = string.Empty;
-            string IVAValue = string.Empty;
-            string InvoiceNumber = string.Empty;
-            string Subtotal = string.Empty;
-
             //Date might be needed to convert to DateTime
             string Date = string.Empty;
 
@@ -105,7 +107,7 @@ namespace FieldRules
             }
 
             //Validate IVA Rules
-            if (NITRules.Validate(value))
+            if (IVARules.Validate(value))
             {
                 IVAValue = IVARules.ExtractIVA(value);
             }
@@ -125,7 +127,10 @@ namespace FieldRules
             //Validate Subtotal
             if (InvoiceDateRules.Validate(value))
             {
-                Subtotal = InvoiceDateRules.ExtractDate(value);
+                string tempDate = InvoiceDateRules.ExtractDate(value);
+                
+                //Is Invoice Date if the current year matches with invoice year
+                InvoiceDate = (InvoiceDateRules.IsCurrentYear(tempDate)) ? tempDate : string.Empty;
             }
         }
     }

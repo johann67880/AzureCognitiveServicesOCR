@@ -12,7 +12,8 @@ namespace FieldRules
         {
             return new List<Func<bool>>
             {
-                //TODO: Define here all the rules needed to validate if value is invoice date
+                //You can add as many rules as you want
+                () => IsDate(value)
             }.Any(date => date());
         }
 
@@ -25,7 +26,9 @@ namespace FieldRules
             };
 
             //Only process value when contains one of the FieldName.
-            if (!fieldName.Contains(value))
+            var contains = fieldName.Any(x => value.Contains(x, StringComparison.OrdinalIgnoreCase));
+
+            if (!contains)
                 return false;
 
             //Regular Expressions to determine if is a valid NIT
@@ -63,13 +66,19 @@ namespace FieldRules
                 " "
             };
 
-            string result = string.Empty;
+            string result = value;
 
             rulesList.ForEach(x =>
-                result = value.Replace(x, string.Empty).Trim()
+                result = Regex.Replace(result, x, string.Empty, RegexOptions.IgnoreCase).Trim()
             );
 
             return result;
+        }
+
+        public static bool IsCurrentYear(string stringDate)
+        {
+            var date = Convert.ToDateTime(stringDate);
+            return DateTime.Now.Year == date.Year;
         }
     }
 }

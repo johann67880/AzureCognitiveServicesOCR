@@ -5,8 +5,8 @@ namespace FieldRules
 {
     class Program
     {
-        public const string subscriptionKey = "";
-        public const string endpoint = @"";
+        public const string subscriptionKey = "0e4838a555f54d118351f34751a350cd";
+        public const string endpoint = @"https://cs-read-pdf-movinova.cognitiveservices.azure.com/";
 
         static void Main(string[] args)
         {

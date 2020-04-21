@@ -25,7 +25,9 @@ namespace FieldRules
             };
 
             //Only process value when contains one of the FieldName.
-            if (!fieldName.Contains(value))
+            var contains = fieldName.Any(x => value.Contains(x, StringComparison.OrdinalIgnoreCase));
+
+            if (!contains)
                 return false;
 
             //Regular Expressions to determine if is a valid NIT
@@ -49,13 +51,14 @@ namespace FieldRules
                 "$",
                 ".",
                 ",",
+                "'",
                 " "
             };
 
-            string result = string.Empty;
+            string result = value;
 
             rulesList.ForEach(x =>
-                result = value.Replace(x, string.Empty).Trim()
+                result = Regex.Replace(result, x, string.Empty, RegexOptions.IgnoreCase).Trim()
             );
 
             return result;
