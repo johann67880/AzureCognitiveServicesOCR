@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Threading;
 
 namespace FieldRules
@@ -21,7 +21,6 @@ namespace FieldRules
                 }
 
                 //batchReadFile.RunAsync(endpoint, subscriptionKey).Wait(50000000);
-
             }
             catch (Exception)
             {
