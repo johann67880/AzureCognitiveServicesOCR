@@ -1,4 +1,4 @@
-﻿using Microsoft.Azure.CognitiveServices.Vision.ComputerVision;
+using Microsoft.Azure.CognitiveServices.Vision.ComputerVision;
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision.Models;
 using System;
 using System.Collections.Generic;
@@ -80,7 +80,7 @@ namespace FieldRules
                     foreach (Word item in line.Words)
                     {
                         Console.WriteLine(item.Text);
-                        //ProcessValue(item.Text, id);
+                        ProcessValue(item.Text);
                     }
                 }
             }
@@ -88,9 +88,45 @@ namespace FieldRules
             Console.ReadLine();
         }
 
-        private void ProcessValue(string value, int id)
+        private void ProcessValue(string value)
         {
-            //TODO: Add rules for different values required
+            string NITValue = string.Empty;
+            string IVAValue = string.Empty;
+            string InvoiceNumber = string.Empty;
+            string Subtotal = string.Empty;
+
+            //Date might be needed to convert to DateTime
+            string Date = string.Empty;
+
+            //Validate NIT Rules
+            if (NITRules.Validate(value))
+            {
+                NITValue = NITRules.ExtractNit(value);
+            }
+
+            //Validate IVA Rules
+            if (NITRules.Validate(value))
+            {
+                IVAValue = IVARules.ExtractIVA(value);
+            }
+
+            //Validate Invoice Number
+            if (InvoiceNumberRules.Validate(value))
+            {
+                InvoiceNumber = InvoiceNumberRules.ExtractInvoiceNumber(value);
+            }
+
+            //Validate Subtotal
+            if (SubtotalRules.Validate(value))
+            {
+                Subtotal = SubtotalRules.ExtractSubtotal(value);
+            }
+
+            //Validate Subtotal
+            if (InvoiceDateRules.Validate(value))
+            {
+                Subtotal = InvoiceDateRules.ExtractDate(value);
+            }
         }
     }
 }
